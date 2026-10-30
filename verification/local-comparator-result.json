@@ -1,0 +1,44 @@
+{
+  "status": "running",
+  "exit_code": null,
+  "recorded_at": "2026-10-23T13:07:22.937103+00:00",
+  "started_at": "2026-10-23T12:59:26.826110+00:00",
+  "start_time_source": "log file creation time",
+  "command": [
+    "lake",
+    "comparator",
+    "--inadvisably-no-sandbox",
+    "--challenge-from-export",
+    ".lake/exports/challenge-comparator.ndjson",
+    "--solution-from-export",
+    ".lake/exports/solution-comparator.ndjson"
+  ],
+  "directory": "lean",
+  "targets": [
+    "EffectiveFreenessPublication.kollar",
+    "EffectiveFreenessPublication.variants.numerical"
+  ],
+  "sandbox_enabled": false,
+  "external_kernel_run": false,
+  "log": "comparator.log",
+  "log_sha256": "1b3af2813844d82d13e55d9179ff49659b92bb452996cf2a8c549f12e9ebee23",
+  "exports": {
+    "challenge": {
+      "file": "lean/.lake/exports/challenge-comparator.ndjson",
+      "sha256": "58fc791175cc27492ff7f8a65d4dde46e2720799b784852e0ee03f0b936ee0fa",
+      "bytes": 483188658,
+      "ignored_cache_file": true
+    },
+    "solution": {
+      "file": "lean/.lake/exports/solution-comparator.ndjson",
+      "sha256": "997b81026678b41f2c22a0881f27046a4506f95113d075ae719f558909262af8",
+      "bytes": 1912468959,
+      "ignored_cache_file": true
+    }
+  },
+  "publication_manifest_sha256": "991a3d6b19122b528e1a454a478837fdac7309412519b7ece43d54be9215f7a6",
+  "config_sha256": "c97a08ee14712eb40ad260c81f805cc0167f732628b7fc58aae633c8c154f35a",
+  "old_combined_f1_f2_receipt_reused": false,
+  "ci_run": false,
+  "published": false
+}

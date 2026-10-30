@@ -1,0 +1,30 @@
+{
+  "checked_at": "2026-10-23T13:07:22.854193+00:00",
+  "status": "pass",
+  "exit_code": 0,
+  "command": [
+    "lake",
+    "env",
+    "lean",
+    "../F2github/verification/FCDefinitionEquivalence.lean"
+  ],
+  "working_directory": "pinned official FC checkout",
+  "previous_source_sha256": "05a11addabd1592007a5dc07d2857e5ed4a98f52db973a458d25aae90fd1af8e",
+  "current_source_sha256": "a11393d4218f1e91dfbfa7a50c56411c1dc9985ae8963e7efe03f7f0d26226d0",
+  "check_source": "FCDefinitionEquivalence.lean",
+  "check_source_sha256": "5726341fc2576a78fbfcbebdaf8259233c2872a113342d4f2add55d98a774bd6",
+  "canonical_definition_body_matches_check_copy": true,
+  "comparison_copy_adjustment": "Namespace names and declaration-time reducibility attributes only",
+  "unsafe_reducibility_override": false,
+  "kernel_checks_bypassed": false,
+  "checks": [
+    "CartierDivisor equality",
+    "sectionSpace equality by Submodule.span_eq",
+    "GloballyGenerated equivalence",
+    "Ample equivalence",
+    "Nef equivalence",
+    "mixedDifference equality",
+    "EffectiveKlt equivalence"
+  ],
+  "proof_library_dictionary_established": false
+}

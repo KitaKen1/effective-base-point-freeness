@@ -1,0 +1,300 @@
+name: "Lean verification"
+"on":
+  push:
+    branches:
+      - "main"
+  workflow_dispatch:
+permissions:
+  contents: "read"
+  actions: "read"
+defaults:
+  run:
+    shell: "bash"
+concurrency:
+  group: "lean-${{ github.ref }}"
+  cancel-in-progress: false
+env:
+  LEAN_NUM_THREADS: "2"
+jobs:
+  build:
+    name: "Ordinary proof build and persistent checkpoint"
+    runs-on: "ubuntu-24.04"
+    timeout-minutes: 360
+    outputs:
+      checkpoint: "proof-build-${{ github.run_attempt }}"
+    steps:
+      -
+        uses: "actions/checkout@11d5960a326750d5838078e36cf38b85af677262"
+        with:
+          persist-credentials: false
+      -
+        name: "Verify identical sources and independent reference"
+        id: "source"
+        run: |-
+          mkdir -p ci-results
+          python3 lean/comparator/check-inputs.py | tee ci-results/source-audit.json
+      -
+        name: "Fingerprint Lean sources and toolchain"
+        id: "fingerprint"
+        run: "echo \"value=$(python3 ci/checkpoint.py fingerprint)\" >> \"$GITHUB_OUTPUT\""
+      -
+        name: "Install pinned Lean and prepare disposable runner"
+        id: "setup"
+        run: "bash ci/setup-lean.sh"
+      -
+        name: "Restore compilation progress"
+        uses: "actions/cache/restore@0057852bfaa89a56745cba8c7296529d2fc39830"
+        with:
+          path: "leanWithoutComparator/.lake/build"
+          key: "f2-build-${{ runner.os }}-${{ steps.fingerprint.outputs.value }}-${{ github.run_id }}-${{ github.run_attempt }}"
+          restore-keys: "f2-build-${{ runner.os }}-${{ steps.fingerprint.outputs.value }}-"
+      -
+        name: "Download pinned Mathlib cache"
+        id: "cache"
+        working-directory: "leanWithoutComparator"
+        run: "lake exe cache get"
+      -
+        name: "Build ordinary proof project"
+        id: "build"
+        working-directory: "leanWithoutComparator"
+        timeout-minutes: 280
+        run: "lake build 2>&1 | tee ../ci-results/build.log"
+      -
+        name: "Check target axiom whitelist"
+        id: "axioms"
+        run: |-
+          (cd leanWithoutComparator && lake env lean FCAudit.lean) 2>&1 | tee ci-results/axioms.log
+          python3 ci/check-axioms.py ci-results/axioms.log ci-results/axiom-audit.json
+      -
+        name: "Save compilation progress"
+        uses: "actions/cache/save@0057852bfaa89a56745cba8c7296529d2fc39830"
+        with:
+          path: "leanWithoutComparator/.lake/build"
+          key: "f2-build-${{ runner.os }}-${{ steps.fingerprint.outputs.value }}-${{ github.run_id }}-${{ github.run_attempt }}"
+        if: "always() && steps.fingerprint.outcome == 'success'"
+      -
+        name: "Pack verified compilation checkpoint"
+        if: "steps.build.outcome == 'success' && steps.axioms.outcome == 'success'"
+        run: "python3 ci/checkpoint.py pack leanWithoutComparator \"$RUNNER_TEMP/proof-checkpoint\""
+      -
+        name: "Upload compiled proof checkpoint"
+        if: "steps.build.outcome == 'success' && steps.axioms.outcome == 'success'"
+        uses: "actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02"
+        with:
+          name: "proof-build-${{ github.run_attempt }}"
+          path: "${{ runner.temp }}/proof-checkpoint/"
+          compression-level: 0
+          retention-days: 1
+          if-no-files-found: "error"
+      -
+        name: "Record verification outcomes"
+        env:
+          PROJECT: "leanWithoutComparator"
+          SOURCE_OUTCOME: "${{ steps.source.outcome }}"
+          SETUP_OUTCOME: "${{ steps.setup.outcome }}"
+          CACHE_OUTCOME: "${{ steps.cache.outcome }}"
+          RESTORE_OUTCOME: "${{ steps.restore.outcome }}"
+          BUILD_OUTCOME: "${{ steps.build.outcome }}"
+          AXIOMS_OUTCOME: "${{ steps.axioms.outcome }}"
+          EXPORT_OUTCOME: "${{ steps.export.outcome }}"
+          INPUTS_OUTCOME: "${{ steps.inputs.outcome }}"
+          COMPARATOR_OUTCOME: "not_requested"
+        if: "always()"
+        run: "python3 ci/record-result.py"
+      -
+        name: "Upload verification logs"
+        if: "always()"
+        uses: "actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02"
+        with:
+          name: "ordinary-build-${{ github.run_attempt }}"
+          path: "ci-results/"
+          retention-days: 14
+  export:
+    name: "Restore proof, build reference, and export"
+    needs: "build"
+    runs-on: "ubuntu-24.04"
+    timeout-minutes: 360
+    outputs:
+      inputs: "comparison-inputs-${{ github.run_attempt }}"
+      build: "${{ steps.build.outcome }}"
+      axioms: "${{ steps.axioms.outcome }}"
+    steps:
+      -
+        uses: "actions/checkout@11d5960a326750d5838078e36cf38b85af677262"
+        with:
+          persist-credentials: false
+      -
+        name: "Verify identical sources and independent reference"
+        id: "source"
+        run: |-
+          mkdir -p ci-results
+          python3 lean/comparator/check-inputs.py | tee ci-results/source-audit.json
+      -
+        name: "Fingerprint Lean sources and toolchain"
+        id: "fingerprint"
+        run: "echo \"value=$(python3 ci/checkpoint.py fingerprint)\" >> \"$GITHUB_OUTPUT\""
+      -
+        name: "Install pinned Lean and prepare disposable runner"
+        id: "setup"
+        run: "bash ci/setup-lean.sh"
+      -
+        name: "Download verified proof checkpoint"
+        uses: "actions/download-artifact@d3f86a106a0bac45b974a628896c90dbdf5c8093"
+        with:
+          name: "${{ needs.build.outputs.checkpoint }}"
+          path: "${{ runner.temp }}/proof-checkpoint/"
+      -
+        name: "Verify and restore proof checkpoint"
+        id: "restore"
+        run: |-
+          python3 ci/checkpoint.py restore lean "$RUNNER_TEMP/proof-checkpoint"
+          cp "$RUNNER_TEMP/proof-checkpoint/build.json" ci-results/build-checkpoint.json
+          rm -f "$RUNNER_TEMP/proof-checkpoint/build.tar.gz"
+          df -h
+      -
+        name: "Restore compilation progress"
+        uses: "actions/cache/restore@0057852bfaa89a56745cba8c7296529d2fc39830"
+        with:
+          path: "lean/.lake/build"
+          key: "f2-canonical-${{ runner.os }}-${{ steps.fingerprint.outputs.value }}-${{ github.run_id }}-${{ github.run_attempt }}"
+          restore-keys: "f2-canonical-${{ runner.os }}-${{ steps.fingerprint.outputs.value }}-"
+      -
+        name: "Download pinned Mathlib cache"
+        id: "cache"
+        working-directory: "lean"
+        run: "lake exe cache get"
+      -
+        name: "Build canonical proof and independent reference"
+        id: "build"
+        working-directory: "lean"
+        timeout-minutes: 230
+        run: "lake build Challenge FCSolution FCAudit 2>&1 | tee ../ci-results/build.log"
+      -
+        name: "Check target axiom whitelist"
+        id: "axioms"
+        run: |-
+          (cd lean && lake env lean FCAudit.lean) 2>&1 | tee ci-results/axioms.log
+          python3 ci/check-axioms.py ci-results/axioms.log ci-results/axiom-audit.json
+      -
+        name: "Save compilation progress"
+        uses: "actions/cache/save@0057852bfaa89a56745cba8c7296529d2fc39830"
+        with:
+          path: "lean/.lake/build"
+          key: "f2-canonical-${{ runner.os }}-${{ steps.fingerprint.outputs.value }}-${{ github.run_id }}-${{ github.run_attempt }}"
+        if: "always() && steps.fingerprint.outcome == 'success'"
+      -
+        name: "Export challenge and solution with pinned leanexport"
+        id: "export"
+        working-directory: "lean"
+        timeout-minutes: 90
+        run: |-
+          python3 comparator/export-local.py Challenge 2>&1 | tee ../ci-results/challenge-export.log
+          python3 comparator/export-local.py FCSolution 2>&1 | tee ../ci-results/solution-export.log
+      -
+        name: "Compress exports and bind source hashes"
+        id: "inputs"
+        run: |-
+          python3 ci/checkpoint.py exports "$RUNNER_TEMP/comparison-inputs" | tee ci-results/export-manifest.log
+          cp "$RUNNER_TEMP/comparison-inputs/exports.json" ci-results/exports.json
+      -
+        name: "Upload comparison inputs"
+        uses: "actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02"
+        with:
+          name: "comparison-inputs-${{ github.run_attempt }}"
+          path: "${{ runner.temp }}/comparison-inputs/"
+          compression-level: 0
+          retention-days: 1
+          if-no-files-found: "error"
+      -
+        name: "Record verification outcomes"
+        env:
+          PROJECT: "lean"
+          SOURCE_OUTCOME: "${{ steps.source.outcome }}"
+          SETUP_OUTCOME: "${{ steps.setup.outcome }}"
+          CACHE_OUTCOME: "${{ steps.cache.outcome }}"
+          RESTORE_OUTCOME: "${{ steps.restore.outcome }}"
+          BUILD_OUTCOME: "${{ steps.build.outcome }}"
+          AXIOMS_OUTCOME: "${{ steps.axioms.outcome }}"
+          EXPORT_OUTCOME: "${{ steps.export.outcome }}"
+          INPUTS_OUTCOME: "${{ steps.inputs.outcome }}"
+          COMPARATOR_OUTCOME: "not_requested"
+        if: "always()"
+        run: "python3 ci/record-result.py"
+      -
+        name: "Upload verification logs"
+        if: "always()"
+        uses: "actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02"
+        with:
+          name: "canonical-export-${{ github.run_attempt }}"
+          path: "ci-results/"
+          retention-days: 14
+  comparator:
+    name: "Sandboxed Comparator and default kernel"
+    needs: "export"
+    env:
+      F2_CI_SWAP_GB: "12"
+    runs-on: "ubuntu-24.04"
+    timeout-minutes: 360
+    steps:
+      -
+        uses: "actions/checkout@11d5960a326750d5838078e36cf38b85af677262"
+        with:
+          persist-credentials: false
+      -
+        name: "Verify identical sources and independent reference"
+        id: "source"
+        run: |-
+          mkdir -p ci-results
+          python3 lean/comparator/check-inputs.py | tee ci-results/source-audit.json
+      -
+        name: "Install pinned Lean and prepare disposable runner"
+        id: "setup"
+        run: "bash ci/setup-lean.sh"
+      -
+        name: "Download source-bound exports"
+        uses: "actions/download-artifact@d3f86a106a0bac45b974a628896c90dbdf5c8093"
+        with:
+          name: "${{ needs.export.outputs.inputs }}"
+          path: "${{ runner.temp }}/comparison-inputs/"
+      -
+        name: "Verify and decompress both exports"
+        id: "inputs"
+        run: |-
+          python3 ci/checkpoint.py verify-exports "$RUNNER_TEMP/comparison-inputs" | tee ci-results/export-verification.json
+          cp "$RUNNER_TEMP/comparison-inputs/exports.json" ci-results/exports.json
+      -
+        name: "Sandboxed target comparison, axiom check, and kernel replay"
+        id: "comparator"
+        working-directory: "lean"
+        timeout-minutes: 335
+        run: |-
+          lake comparator \
+            --challenge-from-export .lake/exports/challenge-comparator.ndjson \
+            --solution-from-export .lake/exports/solution-comparator.ndjson \
+            2>&1 | tee ../ci-results/comparator.log
+          grep -Fq 'Lean default kernel accepts the solution' ../ci-results/comparator.log
+          grep -Fq 'Your solution is okay!' ../ci-results/comparator.log
+          if grep -Fq 'Sandbox disabled' ../ci-results/comparator.log; then exit 1; fi
+      -
+        name: "Record verification outcomes"
+        env:
+          PROJECT: "lean"
+          SOURCE_OUTCOME: "${{ steps.source.outcome }}"
+          SETUP_OUTCOME: "${{ steps.setup.outcome }}"
+          CACHE_OUTCOME: "${{ steps.cache.outcome }}"
+          RESTORE_OUTCOME: "${{ steps.restore.outcome }}"
+          BUILD_OUTCOME: "${{ needs.export.outputs.build }}"
+          AXIOMS_OUTCOME: "${{ needs.export.outputs.axioms }}"
+          EXPORT_OUTCOME: "${{ steps.export.outcome }}"
+          INPUTS_OUTCOME: "${{ steps.inputs.outcome }}"
+          COMPARATOR_OUTCOME: "${{ steps.comparator.outcome }}"
+        if: "always()"
+        run: "python3 ci/record-result.py"
+      -
+        name: "Upload verification logs"
+        if: "always()"
+        uses: "actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02"
+        with:
+          name: "proof-and-comparator-${{ github.run_attempt }}"
+          path: "ci-results/"
+          retention-days: 14

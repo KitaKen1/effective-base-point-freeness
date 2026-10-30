@@ -1,0 +1,9 @@
+**/.lake/
+**/__pycache__/
+.DS_Store
+*.pyc
+
+/ci-results/
+
+/verification/ci/
+/verification/ci-result.json

@@ -1,0 +1,134 @@
+/-
+Copyright (c) 2026 Kenta Kitamura. All rights reserved.
+Released under Apache 2.0 license as described in the file LICENSE.
+Authors: Kenta Kitamura
+-/
+module
+public import MixedFujita.FiniteCenterIdealIsolation
+public import MixedFujita.CenterPreservingExteriorLCSections
+public import MixedFujita.AmpleIdealExactBaseLocus
+public import MixedFujita.ExactNonKltCenterRestriction
+
+/-! モデル・M入力なしの実極小中心孤立化と通常KVによる全大元mL持ち上げ。 See reports/check-268-internal-lc-center-isolation.json for the verified scope. ACTUAL minimal-lc-center isolation now internally constructs the original center ideal finite system, SAME-original-family principalization/residual Bertini, source perturbation, shared SNC model, old-critical positivity and placement. A contained lc center obstructs every positive perturbation, forcing a positive old-critical coefficient on ANY joint model by finite-LC-threshold contradiction. Arbitrary anchor denominators are normalized retaining actual centers. Original positive-numerical klt BPF assumptions construct an isolated restricted-numerical-zero center; EXPLICIT usual H1 KV gives exact-center original mL lifting. Zero-dimensional minimal centers yield original nonvanishing under usual KV. Positive-dimensional numerical-zero-center nonvanishing, general KV, the original nu=0 branch, unconditional BPF and full F1/F2 remain unproved. -/
+
+@[expose] public section
+set_option autoImplicit false
+open AlgebraicGeometry CategoryTheory TopologicalSpace Topology Opposite Limits MonoidalCategory Filter
+open TauCeti.AlgebraicGeometry TauCeti.AlgebraicGeometry.Scheme
+namespace MixedFujita
+universe u
+set_option backward.isDefEq.respectTransparency false
+set_option backward.isDefEq.respectTransparency.types false
+set_option backward.defeqAttrib.useBackward true
+set_option maxHeartbeats 1600000
+attribute [local instance] Classical.propDecidable
+attribute [local instance] cartierGlobalStalkAlgebra cartierGlobalStalkFunctionFieldTower
+  cartierBaseGlobalAlgebra cartierBaseLocalAlgebra cartierBaseOpenAlgebra functionFieldBaseAlgebra
+
+
+/-- An ACTUAL minimal lc center and an actual effective klt anchor construct
+an effective lc pair whose ENTIRE original non-klt locus is EXACTLY that same
+center, preserving ALL large adjoints of the ORIGINAL nef L. The finite center
+ideal system, nonzero original section, principalizing SNC model, residual
+Bertini cut and positive-critical/placement certificates are ALL INTERNAL.
+The two pair presentations here have the same denominator. No initial L
+section, center normality, subadjunction or KV is supplied. -/
+theorem minimal_lc_center_klt_anchor_constructs_exact_nonKlt_isolation
+    (K : Type u) [Field K] [IsAlgClosed K] [CharZero K] {n : ℕ} (hn : 1 ≤ n)
+    {X : Scheme.{u}} [IsIntegral X] [IsLocallyNoetherian X]
+    [X.Over (Spec (CommRingCat.of K))] [IsProper (X ↘ Spec (CommRingCat.of K))]
+    (hnorm : ∀ x : X, IsIntegrallyClosed (X.presheaf.stalk x))
+    (c : EtaleChart K X n) (f : X.functionFieldˣ) (d : ℕ) (hd : 1 ≤ d)
+    (D A : CartierDivisor X) (hD : LogPairBoundaryEffective c f d D)
+    (hA : LogPairBoundaryEffective c f d A) (hklt : LogPairIsKlt c f d A)
+    (Z : Closeds X) (hZ : LogPairIsLogCanonicalCenter c f d D Z)
+    (hmin : ∀ V : Closeds X, LogPairIsLogCanonicalCenter c f d D V → V ≤ Z → V = Z)
+    (L : CartierDivisor X) (hL : CartierIsNef K L) (b : ℕ)
+    (hH : CartierIsAmpleProj K ((d * b) • L - D)) :
+    ∃ d' : ℕ, 1 ≤ d' ∧ ∃ D' : CartierDivisor X,
+      LogPairBoundaryEffective c f d' D' ∧ LogPairIsLogCanonical c f d' D' ∧
+      LogPairIsLogCanonicalCenter c f d' D' Z ∧
+      (∀ m : ℕ, b ≤ m → CartierIsAmpleProj K ((d' * m) • L - D')) ∧
+      ∀ x : X, (¬ LogPairIsKltOverBasePoint (𝟙 X) x c f d' D') ↔ x ∈ Z := by
+  classical
+  let H := (d * b) • L - D
+  let I := Scheme.IdealSheafData.vanishingIdeal Z
+  have hIZ : I.support = Z := SetLike.coe_injective (Scheme.IdealSheafData.coe_support_vanishingIdeal Z)
+  obtain ⟨x₀, hx₀⟩ := (logPairIsLogCanonicalCenter_isIrreducible c f d D Z hZ).nonempty
+  have hnot : ¬ LogPairIsKlt c f d D := by
+    intro h
+    exact logPairIsLogCanonicalCenter_not_kltOverBasePoint c f d D Z hZ x₀ hx₀
+      (((logPairIsKlt_iff_forall_basePoint (𝟙 X) c f d D).mp h) x₀)
+  have hcov : CodimOneChartCovered n K X :=
+    normal_codimOneChartCovered (K := K) (etaleChart_topologicalKrullDim c) hnorm
+  obtain ⟨J, _, _, hgenJ, _, _, _, _, _, hNKJ, _, _, _⟩ :=
+    lc_pair_exists_unique_reduced_nonKlt_subscheme K hn hnorm hcov ⟨H, hH⟩ c f d hd D hD hZ.1 hnot
+  have hZJ := logCanonicalCenter_le_nonKlt_support c f d D J hNKJ Z hZ
+  have hgenZ : genericPoint X ∉ Z := fun h => hgenJ (hZJ h)
+  have hgenI : genericPoint X ∉ I.support := by simpa only [hIZ] using hgenZ
+  obtain ⟨a₀, hfamily⟩ := ample_ideal_finite_sections_common_zero_locus_exact_support H hH I
+  let P := (a₀ + 1) • H
+  obtain ⟨k, s, hzero, hunit, _⟩ := hfamily (a₀ + 1) (by omega)
+  obtain ⟨i₀, hi₀⟩ := hunit (genericPoint X) hgenI
+  have hs₀ : s i₀ ≠ 0 := (cartierLocalCoefficient_ne_zero_iff P (genericPoint X) _ _ _).mp hi₀.ne_zero
+  obtain ⟨r, e, he, hcover⟩ := finite_family_exists_nonzero_index_subfamily k s
+  let v : Fin (r + 1) → Γ(P.sheaf, ⊤) := Fin.cons (s i₀) (fun i => s (e i))
+  have hv : ∀ i, v i ≠ 0 := fun i => Fin.cases hs₀ (fun j => he j) i
+  have hvzero : ∀ i, modulePullbackGlobalSections I.subschemeι P.sheaf (v i) = 0 :=
+    fun i => Fin.cases (hzero i₀) (fun j => hzero (e j)) i
+  have hbase : ((cartierSectionBaseIdeal P v hv).support : Set X) ⊆ Z := by
+    intro x hx
+    by_contra hxZ
+    have hxZ' : x ∉ Z := hxZ
+    have hxI : x ∉ I.support := by simpa only [hIZ] using hxZ'
+    obtain ⟨j, hj⟩ := hunit x hxI
+    have hsj : s j ≠ 0 := (cartierLocalCoefficient_ne_zero_iff P x _ _ _).mp hj.ne_zero
+    obtain ⟨l, hl⟩ := hcover j hsj
+    rw [cartierSectionBaseIdeal_support (K := K), Set.mem_iInter] at hx
+    have hz := hx l.succ
+    change x ∈ cartierSectionZeroLocus P (s (e l)) at hz
+    rw [hl] at hz
+    exact hz ((mem_cartierSectionNonvanishingOpen_iff_localCoefficient P (s j) x _ _).mpr hj)
+  obtain ⟨u, hu, _, p, q, N₀, _, hq, hpair⟩ :=
+    original_finite_center_ideal_system_constructs_isolated_lc_pair K hnorm c f d hd D A hD hA hklt
+      Z hZ hmin P r v hv hvzero hbase L hL b hH
+  obtain ⟨heff', hlc', hZ', hamp, hNK⟩ := hpair N₀ le_rfl
+  exact ⟨q * (N₀ + 1) * d, Nat.mul_pos (Nat.mul_pos (by omega) (by omega)) (by omega),
+    _, heff', hlc', hZ', hamp, hNK⟩
+
+
+/-- FULL internal minimal-center isolation supplies restriction lifting for
+ALL large ORIGINAL mL under EXPLICIT usual H1 KV. No supplied model, divisor,
+finite family, critical-placement/positivity, kernel identification or center
+normality is needed. Nonzero sections on the center and usual KV itself remain
+separate; the source L is unchanged throughout. -/
+theorem minimal_lc_center_klt_anchor_all_large_original_restriction_lifting
+    (K : Type u) [Field K] [IsAlgClosed K] [CharZero K] {n : ℕ} (hn : 1 ≤ n)
+    {X : Scheme.{u}} [IsIntegral X] [IsLocallyNoetherian X]
+    [X.Over (Spec (CommRingCat.of K))] [IsProper (X ↘ Spec (CommRingCat.of K))]
+    (hnorm : ∀ x : X, IsIntegrallyClosed (X.presheaf.stalk x))
+    (c : EtaleChart K X n) (f : X.functionFieldˣ) (d : ℕ) (hd : 1 ≤ d)
+    (D A : CartierDivisor X) (hD : LogPairBoundaryEffective c f d D)
+    (hA : LogPairBoundaryEffective c f d A) (hklt : LogPairIsKlt c f d A)
+    (Z : Closeds X) (hZ : LogPairIsLogCanonicalCenter c f d D Z)
+    (hmin : ∀ V : Closeds X, LogPairIsLogCanonicalCenter c f d D V → V ≤ Z → V = Z)
+    (L : CartierDivisor X) (hL : CartierIsNef K L) (b : ℕ)
+    (hH : CartierIsAmpleProj K ((d * b) • L - D)) :
+    ∀ (m : ℕ), b ≤ m → ∀ (_ : KawamataViehwegVanishingSNC K n),
+      let I := Scheme.IdealSheafData.vanishingIdeal Z
+      Subsingleton (Scheme.Modules.Cohomology ((m • L).sheaf ⊗ idealSheafDataModule I) 1) ∧
+        (∃ τ : (m • L).sheaf ⟶ (Scheme.Modules.pushforward I.subschemeι).obj
+          ((Scheme.Modules.pullback I.subschemeι).obj (m • L).sheaf),
+          Function.Surjective (Scheme.Modules.Hom.app τ ⊤)) ∧
+        ∀ t : Γ((Scheme.Modules.pullback I.subschemeι).obj (m • L).sheaf, ⊤), t ≠ 0 →
+          ∃ x : X, x ∈ Z ∧ x ∉ cartierBaseLocus (m • L) := by
+  obtain ⟨d', hd', D', heff', _, hZ', hamp, hNK⟩ :=
+    minimal_lc_center_klt_anchor_constructs_exact_nonKlt_isolation K hn hnorm c f d hd D A hD hA hklt
+      Z hZ hmin L hL b hH
+  intro m hm hKV
+  have hP : CartierIsAmpleProj K (d' • (m • L) - D') := by simpa only [smul_smul] using hamp m hm
+  exact exact_nonKlt_lc_center_restriction_lifting_of_usual_KV K hn hnorm c f d' hd' D' heff' Z hZ' hNK
+    ((d * b) • L - D) hH hKV (m • L) (cartierIsAmpleProj_isNef hP)
+    (cartierIsAmpleProj_isBig (etaleChart_topologicalKrullDim c) hn hP)
+
+end MixedFujita

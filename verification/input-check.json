@@ -1,0 +1,17 @@
+{
+  "status": "pass",
+  "shared_lean_sources": 2871,
+  "targets": [
+    "EffectiveFreenessPublication.kollar",
+    "EffectiveFreenessPublication.variants.numerical"
+  ],
+  "reference_import_closure": 1628,
+  "fclike_definition_count": 7,
+  "fclike_statement_holes": 2,
+  "f1_publication_target_included": false,
+  "fclike_instance_count": 1,
+  "fclike_variable_declarations": 0,
+  "fclike_definition_copy_matches_audit": true,
+  "parent_scope": "complex projective, integral a >= 1",
+  "fclike_to_library_kernel_dictionary": "not established"
+}
