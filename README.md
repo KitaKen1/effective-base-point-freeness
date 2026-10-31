@@ -2,7 +2,7 @@
 
 # Effective base point freeness and its numerical variant
 
-[![Lean verification](https://github.com/KitaKen1/effective-base-point-freeness/actions/workflows/lean.yml/badge.svg)](https://github.com/KitaKen1/effective-base-point-freeness/actions/workflows/lean.yml)
+[![Lean verification](https://github.com/KitaKen1/effective-base-point-freeness/actions/workflows/lean.yml/badge.svg)](https://github.com/KitaKen1/effective-base-point-freeness/actions/runs/41138711113)
 
 Lean proofs of the complex projective, integral-parameter case of the linear
 effective-freeness prediction in Kollár (1993), and a numerical-dimension variant (F2).

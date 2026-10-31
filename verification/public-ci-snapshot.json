@@ -1,0 +1,50 @@
+{
+  "package": "F2github-public",
+  "repository": "KitaKen1/effective-base-point-freeness",
+  "private": false,
+  "checked_at": "2026-10-31T04:04:53.401925+00:00",
+  "issue_writes": false,
+  "repository_visibility_changed": false,
+  "runs": [
+    {
+      "id": 41138711113,
+      "url": "https://github.com/KitaKen1/effective-base-point-freeness/actions/runs/41138711113",
+      "commit": "c59f4ead8983046e2684d97c333559842948f1bf",
+      "attempt": 1,
+      "status": "completed",
+      "conclusion": "success",
+      "created_at": "2026-10-30T22:31:41Z",
+      "updated_at": "2026-10-31T04:04:04Z",
+      "job_status_source": "GitHub Checks API",
+      "jobs": [
+        {
+          "id": 124417564045,
+          "name": "Sandboxed Comparator and default kernel",
+          "status": "completed",
+          "conclusion": "success",
+          "started_at": "2026-10-31T02:36:22Z",
+          "completed_at": "2026-10-31T04:04:03Z",
+          "url": "https://github.com/KitaKen1/effective-base-point-freeness/actions/runs/41138711113/job/124417564045"
+        },
+        {
+          "id": 124415689291,
+          "name": "Restore proof, build reference, and export",
+          "status": "completed",
+          "conclusion": "success",
+          "started_at": "2026-10-31T02:28:14Z",
+          "completed_at": "2026-10-31T02:36:20Z",
+          "url": "https://github.com/KitaKen1/effective-base-point-freeness/actions/runs/41138711113/job/124415689291"
+        },
+        {
+          "id": 124347445367,
+          "name": "Ordinary proof build and persistent checkpoint",
+          "status": "completed",
+          "conclusion": "success",
+          "started_at": "2026-10-30T22:31:43Z",
+          "completed_at": "2026-10-31T02:28:11Z",
+          "url": "https://github.com/KitaKen1/effective-base-point-freeness/actions/runs/41138711113/job/124347445367"
+        }
+      ]
+    }
+  ]
+}

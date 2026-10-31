@@ -11,8 +11,8 @@
   "proof_mathlib_commit": "f6090c7095e1e56b3464c1daba5f24631f1290d2",
   "shared_lean_sources": 2871,
   "fclike_to_library_kernel_dictionary": "not established",
-  "ci_run": false,
-  "published": false,
+  "ci_run": true,
+  "published": true,
   "excluded": [
     ".lake caches",
     ".git",
@@ -47,8 +47,8 @@
       "bytes": 1923
     },
     "README.md": {
-      "sha256": "b2f2c80143bb4ca993e5f3a2d5f8d5d1279af20ace74e4dd962b68a9dd995334",
-      "bytes": 7205
+      "sha256": "f90b1c08e618c3026367ab1ec45304733a9f9465ea4b68caf7c997349c24d710",
+      "bytes": 7203
     },
     "ci/README.md": {
       "sha256": "e159c2113f403395e37eed02a0a46681fd80f2a3b6f38d617f231cbdae125036",
@@ -23159,12 +23159,12 @@
       "bytes": 344827
     },
     "verification/CI.md": {
-      "sha256": "9d8d5e15daafac0686882044552d10d9501b764caea00c827847c471fefffbe4",
-      "bytes": 1081
+      "sha256": "ed7448163a5b7db2b66309ce5e1ecac66ad3e8441d8adc297f35ba600a29fee2",
+      "bytes": 2444
     },
     "verification/README.md": {
-      "sha256": "0001e374e9ac9132e2ed19ac169ab074696699b849ff44e3f505daaabf728217",
-      "bytes": 3025
+      "sha256": "49cfa64574f8af77f9f890f15312f26b89d717999c89f66502e768b0b8d391f5",
+      "bytes": 3031
     },
     "verification/make-guide.py": {
       "sha256": "f0c8ddb21e7dcf2c8e09fd996c5b91ad66ae74b2661b79ed7e42b3937b39d503",
@@ -23173,10 +23173,21 @@
     "verification/refresh-records.py": {
       "sha256": "a0d3cdb796557c9c752ca29de4bfe6c43c4e7385041c266f6deadf38cdb4289d",
       "bytes": 5462
+    },
+    "verification/public-ci-evidence.json": {
+      "sha256": "3512fcc2814d42f22f543ebfdb46389e6e5b9cdef7f88ed4e61b27fcae3c4017",
+      "bytes": 6529
+    },
+    "verification/public-ci-snapshot.json": {
+      "sha256": "fd53a3188e00cf5173c99b60103ae17dbc3c71d4e748a080dcca0e3daa250956",
+      "bytes": 1885
     }
   },
   "public_ci_prepared_at": "2026-10-31",
   "public_repository": "KitaKen1/effective-base-point-freeness",
   "publication_status": "tentative",
-  "public_ci_status": "pending at packaging time"
+  "public_ci_status": "pass",
+  "public_ci_run_id": 41138711113,
+  "public_ci_source_commit": "c59f4ead8983046e2684d97c333559842948f1bf",
+  "public_ci_checked_at": "2026-10-31T04:05:00+00:00"
 }

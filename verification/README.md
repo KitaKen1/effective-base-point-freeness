@@ -9,7 +9,7 @@ targets. No old combined-package Comparator receipt is reused as a new result.
 | Ordinary build without Comparator | Pass | `ordinary-build.log` |
 | Target axioms | Only `propext`, `Classical.choice`, `Quot.sound` | Both build logs |
 | Reference signatures and 2,871 shared source copies | Pass | `input-check.json` |
-| Public Linux Comparator and kernel replay | Pending at packaging time | [CI.md](CI.md) |
+| Public Linux Comparator and kernel replay | Pass | [CI.md](CI.md), `public-ci-evidence.json` |
 | Historical macOS replay | Exit code not recorded in the original receipt | `local-comparator-result.json`, `comparator.log` |
 | Mathlib-only FC mathematical body | Pass | `fc-mathlib-only.log` |
 | Seven simplified definitions agree with the previous FC definitions | Pass | `FCDefinitionEquivalence.lean`, `fc-simplification.log` |

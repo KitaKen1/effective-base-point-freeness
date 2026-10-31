@@ -1,0 +1,181 @@
+{
+  "repository": "KitaKen1/effective-base-point-freeness",
+  "private": false,
+  "run_id": 41138711113,
+  "run_url": "https://github.com/KitaKen1/effective-base-point-freeness/actions/runs/41138711113",
+  "commit": "c59f4ead8983046e2684d97c333559842948f1bf",
+  "status": "completed",
+  "conclusion": "success",
+  "checked_at": "2026-10-31T04:05:00+00:00",
+  "run_attempt": 1,
+  "scope": "library-backed proof targets",
+  "fc_statement_proof_completed": false,
+  "source_fingerprint": "5a92801be8a12b8717d4d772cfd355d62d2f41a61d86a54dc4984ab19ef66ebe",
+  "evidence": [
+    {
+      "name": "ordinary-build-1",
+      "id": 13026961267,
+      "zip_sha256": "0910a1be067e7634c0f69fd36a54374127b249bb3355fc1c8f51eae9d79e8d6f",
+      "result": {
+        "recorded_at": "2026-10-31T02:28:08.223767+00:00",
+        "repository": "KitaKen1/effective-base-point-freeness",
+        "commit": "c59f4ead8983046e2684d97c333559842948f1bf",
+        "run_id": "41138711113",
+        "run_attempt": "1",
+        "project": "leanWithoutComparator",
+        "targets": [
+          "EffectiveFreenessPublication.kollar",
+          "EffectiveFreenessPublication.variants.numerical"
+        ],
+        "steps": {
+          "source": "success",
+          "setup": "success",
+          "cache": "success",
+          "restore": "",
+          "build": "success",
+          "axioms": "success",
+          "export": "",
+          "inputs": "",
+          "comparator": "not_requested"
+        },
+        "comparator_sandbox_disabled": false,
+        "fc_representation_to_library_dictionary": "not established",
+        "fc_statement_proof_completed": false,
+        "scope": "library-backed proof; separate standalone FC representation excluded"
+      },
+      "axiom_audit": {
+        "status": "pass",
+        "targets": {
+          "EffectiveFreenessPublication.kollar": [
+            "Classical.choice",
+            "Quot.sound",
+            "propext"
+          ],
+          "EffectiveFreenessPublication.variants.numerical": [
+            "Classical.choice",
+            "Quot.sound",
+            "propext"
+          ]
+        }
+      }
+    },
+    {
+      "name": "canonical-export-1",
+      "id": 13026658736,
+      "zip_sha256": "5586ddecd0a0f113b4ec52132a83f6264f45f1f14e3832e934cf0eb07973d215",
+      "result": {
+        "recorded_at": "2026-10-31T02:36:18.264400+00:00",
+        "repository": "KitaKen1/effective-base-point-freeness",
+        "commit": "c59f4ead8983046e2684d97c333559842948f1bf",
+        "run_id": "41138711113",
+        "run_attempt": "1",
+        "project": "lean",
+        "targets": [
+          "EffectiveFreenessPublication.kollar",
+          "EffectiveFreenessPublication.variants.numerical"
+        ],
+        "steps": {
+          "source": "success",
+          "setup": "success",
+          "cache": "success",
+          "restore": "success",
+          "build": "success",
+          "axioms": "success",
+          "export": "success",
+          "inputs": "success",
+          "comparator": "not_requested"
+        },
+        "comparator_sandbox_disabled": false,
+        "fc_representation_to_library_dictionary": "not established",
+        "fc_statement_proof_completed": false,
+        "scope": "library-backed proof; separate standalone FC representation excluded"
+      },
+      "axiom_audit": {
+        "status": "pass",
+        "targets": {
+          "EffectiveFreenessPublication.kollar": [
+            "Classical.choice",
+            "Quot.sound",
+            "propext"
+          ],
+          "EffectiveFreenessPublication.variants.numerical": [
+            "Classical.choice",
+            "Quot.sound",
+            "propext"
+          ]
+        }
+      }
+    },
+    {
+      "name": "proof-and-comparator-1",
+      "id": 13028683797,
+      "zip_sha256": "0337ff828ce40037257b160b64444481663c2d76ed227f9f2ff32ab46927bc2a",
+      "result": {
+        "recorded_at": "2026-10-31T04:04:00.683947+00:00",
+        "repository": "KitaKen1/effective-base-point-freeness",
+        "commit": "c59f4ead8983046e2684d97c333559842948f1bf",
+        "run_id": "41138711113",
+        "run_attempt": "1",
+        "project": "lean",
+        "targets": [
+          "EffectiveFreenessPublication.kollar",
+          "EffectiveFreenessPublication.variants.numerical"
+        ],
+        "steps": {
+          "source": "success",
+          "setup": "success",
+          "cache": "",
+          "restore": "",
+          "build": "success",
+          "axioms": "success",
+          "export": "",
+          "inputs": "success",
+          "comparator": "success"
+        },
+        "comparator_sandbox_disabled": false,
+        "fc_representation_to_library_dictionary": "not established",
+        "fc_statement_proof_completed": false,
+        "scope": "library-backed proof; separate standalone FC representation excluded"
+      },
+      "axiom_audit": null,
+      "comparator_success_marker": true,
+      "default_kernel_accepts": true,
+      "sandbox_disabled_warning": false
+    }
+  ],
+  "build_checkpoint": {
+    "source_fingerprint": "5a92801be8a12b8717d4d772cfd355d62d2f41a61d86a54dc4984ab19ef66ebe",
+    "toolchain": "leanprover/lean4:v4.35.0-rc3",
+    "comparator_config_sha256": "c97a08ee14712eb40ad260c81f805cc0167f732628b7fc58aae633c8c154f35a",
+    "commit": "c59f4ead8983046e2684d97c333559842948f1bf",
+    "run_id": "41138711113",
+    "run_attempt": "1",
+    "built_in_project": "leanWithoutComparator",
+    "archive_sha256": "dc16da1cd85d22be42349c6d4e5e6f9c69da4418239116bf8d8cde638f78d25f",
+    "archive_bytes": 956197168
+  },
+  "exports": {
+    "source_fingerprint": "5a92801be8a12b8717d4d772cfd355d62d2f41a61d86a54dc4984ab19ef66ebe",
+    "toolchain": "leanprover/lean4:v4.35.0-rc3",
+    "comparator_config_sha256": "c97a08ee14712eb40ad260c81f805cc0167f732628b7fc58aae633c8c154f35a",
+    "commit": "c59f4ead8983046e2684d97c333559842948f1bf",
+    "run_id": "41138711113",
+    "run_attempt": "1",
+    "exports": {
+      "challenge": {
+        "sha256": "58fc791175cc27492ff7f8a65d4dde46e2720799b784852e0ee03f0b936ee0fa",
+        "bytes": 483188658,
+        "compressed_sha256": "d0661288597823a72e9fe1c182a1f453a005a9f77b0b6f8f250584f02f7fb1a7"
+      },
+      "solution": {
+        "sha256": "997b81026678b41f2c22a0881f27046a4506f95113d075ae719f558909262af8",
+        "bytes": 1912468959,
+        "compressed_sha256": "f45a25997c65689660fec12ebd5c4ffe3a7578d02fdf5b6dc87df867a5157137"
+      }
+    },
+    "targets": [
+      "EffectiveFreenessPublication.kollar",
+      "EffectiveFreenessPublication.variants.numerical"
+    ]
+  }
+}
